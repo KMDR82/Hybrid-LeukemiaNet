@@ -118,7 +118,7 @@ def paired_tests(pred, out, n_boot):
     for stage in ("zero_shot", "adapted"):
         plan += [(f"hybrid_{stage}_0", f"cnn_{stage}_0"), (f"hybrid_{stage}_0", f"vit_{stage}_0"),
                  (f"hybrid_{stage}_1", f"hybrid_{stage}_0")]
-    plan += [("hybrid_adapted_0", "hybrid_zero_shot_0")]
+    plan += [(f"{a}_adapted_0", f"{a}_zero_shot_0") for a in ("hybrid", "cnn", "vit")]
     for r, g in wide.groupby("repeat"):
         g = g.reset_index(drop=True)
         for a, b in plan:

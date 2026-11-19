@@ -15,6 +15,7 @@ Stages
   6 analyze          tables with subject-level bootstrap CIs and paired tests
   7 figures          figures from the logged results
   8 explain          Grad-CAM / attention-rollout figure
+  9 tex_tables       LaTeX tables for the manuscript and supplement
 """
 import argparse
 import datetime as dt
@@ -84,6 +85,7 @@ def main():
                      "--tables", RES / "tables", "--out", RES / "figures"], None),
         ("explain", ["explain.py", "--data-root", a.data_root, "--splits", splits, "--target", RES / "target",
                      "--out", RES / "figures"], None),
+        ("tex_tables", ["make_tex_tables.py", "--results", RES, "--splits", splits, "--out", RES / "tex"], None),
     ]
     log("=" * 60)
     log(f"Pipeline start, data root = {a.data_root}")
