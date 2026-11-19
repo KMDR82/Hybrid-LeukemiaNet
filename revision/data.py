@@ -48,13 +48,17 @@ class _Fixed:
         return self.fn(img)
 
 
+def _bright_contrast(im):
+    return TF.adjust_contrast(TF.adjust_brightness(im, 1.2), 1.2)
+
+
 def tta_transforms():
     base = [T.Resize((SIZE, SIZE))]
     tail = [T.ToTensor(), T.Normalize(MEAN, STD)]
     return [
         T.Compose(base + tail),
         T.Compose(base + [_Fixed(TF.hflip)] + tail),
-        T.Compose(base + [_Fixed(lambda im: TF.adjust_contrast(TF.adjust_brightness(im, 1.2), 1.2))] + tail),
+        T.Compose(base + [_Fixed(_bright_contrast)] + tail),
     ]
 
 
