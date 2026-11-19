@@ -53,6 +53,25 @@ class LeukemiaNet(nn.Module):
         # stream-masking switches (hybrid only, inference-time analysis)
         self.mask_cnn = False
         self.mask_vit = False
+        # head-only adaptation (variant B): backbones frozen and kept in eval
+        # mode, so their batch-norm statistics and dropout do not change
+        self.freeze_backbones = False
+
+    def set_head_only(self, flag=True):
+        self.freeze_backbones = flag
+        for net in (self.cnn, self.vit):
+            if net is not None:
+                for prm in net.parameters():
+                    prm.requires_grad = not flag
+        self.train(self.training)
+
+    def train(self, mode=True):
+        super().train(mode)
+        if self.freeze_backbones:
+            for net in (self.cnn, self.vit):
+                if net is not None:
+                    net.eval()
+        return self
 
     def features(self, x):
         parts = []

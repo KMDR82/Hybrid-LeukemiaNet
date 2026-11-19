@@ -52,7 +52,7 @@ def fit(model, train_loader, device, *, lr, weight_decay, max_epochs, val_loader
     Returns (history, best_epoch, train_seconds).
     """
     criterion = nn.CrossEntropyLoss(weight=weights)
-    optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
+    optimizer = torch.optim.AdamW([q for q in model.parameters() if q.requires_grad], lr=lr, weight_decay=weight_decay)
     scaler = torch.amp.GradScaler(device.type, enabled=device.type == "cuda")
     stopper = EarlyStopping(patience, min_delta) if val_loader is not None else None
     history, t0 = [], time.time()

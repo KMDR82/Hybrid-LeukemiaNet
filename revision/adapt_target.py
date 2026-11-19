@@ -14,13 +14,20 @@ Conditions written to predictions.csv (one row per test image):
 
 Usage:
   python revision/adapt_target.py --data-root DATA --arch hybrid cnn vit
+
+Variant B (pre-specified): --mode head trains only the classifier head (both
+backbones frozen, in eval mode) at lr 5e-4; --balanced draws adaptation-train
+cells with class-balanced sampling (WeightedRandomSampler) instead of using a
+class-weighted loss. The source variant (augmentation, colour standardisation)
+is read from <source>/variant.json.
 """
+import json
 import argparse
 from pathlib import Path
 
 import pandas as pd
 import torch
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, WeightedRandomSampler
 
 from common import get_device, load_index, save_json, seed_worker, set_seed
 from data import CellDataset, eval_transform, train_transform, tta_transforms
@@ -28,12 +35,18 @@ from engine import class_weights, fit, predict
 from models import LeukemiaNet
 
 
-def make_loader(df, root, tf, bs, workers, seed, shuffle):
+def make_loader(df, root, tf, bs, workers, seed, shuffle, balanced=False):
     g = torch.Generator()
     g.manual_seed(seed)
-    return DataLoader(CellDataset(df, root, tf), batch_size=bs, shuffle=shuffle, num_workers=workers,
-                      pin_memory=True, worker_init_fn=seed_worker, generator=g,
-                      drop_last=shuffle and len(df) > bs)
+    sampler = None
+    if balanced:
+        counts = df["label"].value_counts()
+        w = df["label"].map(lambda c: 1.0 / counts[c]).to_numpy()
+        sampler = WeightedRandomSampler(torch.as_tensor(w, dtype=torch.double), num_samples=len(df),
+                                        replacement=True, generator=g)
+    return DataLoader(CellDataset(df, root, tf), batch_size=bs, shuffle=shuffle and sampler is None,
+                      sampler=sampler, num_workers=workers, pin_memory=True, worker_init_fn=seed_worker,
+                      generator=g, drop_last=shuffle and len(df) > bs)
 
 
 def evaluate_all(model, arch, test, args, stage, repeat):
@@ -45,7 +58,7 @@ def evaluate_all(model, arch, test, args, stage, repeat):
         for tta in (0, 1):
             if masking != "none" and tta:
                 continue
-            tf = tta_transforms() if tta else eval_transform()
+            tf = tta_transforms(args.std) if tta else eval_transform(args.std)
             bs = max(1, args.batch_size // 3) if tta else args.batch_size
             p, _, i = predict(model, make_loader(test, args.data_root, tf, bs, args.workers, args.seed, False),
                               args.device, tta=bool(tta))
@@ -65,7 +78,9 @@ def main():
     ap.add_argument("--out", default="revision/results/target")
     ap.add_argument("--arch", nargs="+", default=["hybrid", "cnn", "vit"])
     ap.add_argument("--repeats", type=int, nargs="*", default=None, help="default: all")
-    ap.add_argument("--lr", type=float, default=5e-5)
+    ap.add_argument("--lr", type=float, default=None, help="default 5e-5 (full) or 5e-4 (head)")
+    ap.add_argument("--mode", default="full", choices=["full", "head"])
+    ap.add_argument("--balanced", action="store_true")
     ap.add_argument("--weight-decay", type=float, default=1e-4)
     ap.add_argument("--max-epochs", type=int, default=30)
     ap.add_argument("--patience", type=int, default=5)
@@ -76,6 +91,15 @@ def main():
     ap.add_argument("--no-pretrained", action="store_true", help="smoke tests only")
     args = ap.parse_args()
     args.device = get_device()
+    if args.lr is None:
+        args.lr = 5e-4 if args.mode == "head" else 5e-5
+    vf = Path(args.source) / "variant.json"
+    variant = json.loads(vf.read_text()) if vf.exists() else {"aug": "basic", "standardize": False}
+    args.aug = variant["aug"]
+    args.std = None
+    if variant.get("standardize"):
+        ref = json.loads((Path(args.source) / "color_reference.json").read_text())
+        args.std = (ref["mean"], ref["sd"])
 
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -111,14 +135,17 @@ def main():
             model.load_state_dict(state)
             preds += evaluate_all(model, arch, test, args, "zero_shot", r)
 
+            if args.mode == "head":
+                model.set_head_only(True)
             hist, best_epoch, secs = fit(
-                model, make_loader(a_train, args.data_root, train_transform(), args.batch_size, args.workers,
-                                   args.seed + int(r), True), args.device,
+                model, make_loader(a_train, args.data_root, train_transform(args.aug, args.std), args.batch_size,
+                                   args.workers, args.seed + int(r), True, balanced=args.balanced), args.device,
                 lr=args.lr, weight_decay=args.weight_decay, max_epochs=args.max_epochs,
-                val_loader=make_loader(a_val, args.data_root, eval_transform(), args.batch_size, args.workers,
-                                       args.seed, False),
+                val_loader=make_loader(a_val, args.data_root, eval_transform(args.std), args.batch_size,
+                                       args.workers, args.seed, False),
                 patience=args.patience, min_delta=args.min_delta,
-                weights=class_weights(a_train.label, args.device))
+                weights=None if args.balanced else class_weights(a_train.label, args.device))
+            model.set_head_only(False)
             pd.DataFrame(hist).to_csv(out / f"history_r{r}_{arch}.csv", index=False)
             runs.append({"repeat": int(r), "arch": arch, "best_epoch": best_epoch, "epochs_run": len(hist),
                          "train_seconds": secs,

@@ -22,7 +22,7 @@ import torch
 from torch.utils.data import DataLoader
 
 from common import get_device, load_index, save_json, seed_worker, set_seed
-from data import CellDataset, eval_transform, train_transform
+from data import CellDataset, compute_color_reference, eval_transform, train_transform
 from engine import class_weights, fit, predict
 from metrics import binary_metrics, youden_threshold
 from models import LeukemiaNet, count_parameters
@@ -62,6 +62,8 @@ def main():
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--no-pretrained", action="store_true", help="smoke tests only")
     ap.add_argument("--skip-cv", action="store_true", help="reuse saved CV results, train final model only")
+    ap.add_argument("--aug", default="basic", choices=["basic", "strong"], help="training augmentation (data.py)")
+    ap.add_argument("--standardize", action="store_true", help="cell-wise colour standardisation (data.py)")
     args = ap.parse_args()
 
     device = get_device()
@@ -69,6 +71,18 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     src = load_index(Path(args.splits) / "source_index.csv")
     folds = sorted(src["fold"].unique())
+
+    std = None
+    if args.standardize:  # reference colour statistics from SOURCE-phase images only
+        ref_f = Path(args.out) / "color_reference.json"
+        if not ref_f.exists():
+            m, s = compute_color_reference(src, args.data_root)
+            save_json({"mean": m, "sd": s, "computed_from": "source phase (training) images"}, ref_f)
+        import json
+        ref = json.loads(ref_f.read_text())
+        std = (ref["mean"], ref["sd"])
+    save_json({"aug": args.aug, "standardize": bool(args.standardize)}, Path(args.out) / "variant.json")
+    tr_tf, ev_tf = train_transform(args.aug, std), eval_transform(std)
 
     if not args.skip_cv:
         fold_rows, oof = [], []
@@ -88,13 +102,13 @@ def main():
                   f"inner-val {val.subject.nunique()} / {len(val)}, test {test.subject.nunique()} / {len(test)}")
             model = LeukemiaNet(args.arch, pretrained=not args.no_pretrained).to(device)
             hist, best_epoch, secs = fit(
-                model, loader(train, args.data_root, train_transform(), args, True), device,
+                model, loader(train, args.data_root, tr_tf, args, True), device,
                 lr=args.lr, weight_decay=args.weight_decay, max_epochs=args.max_epochs,
-                val_loader=loader(val, args.data_root, eval_transform(), args, False),
+                val_loader=loader(val, args.data_root, ev_tf, args, False),
                 patience=args.patience, min_delta=args.min_delta,
                 weights=class_weights(train.label, device))
             pd.DataFrame(hist).to_csv(out / f"fold{k}_history.csv", index=False)
-            p, y, i = predict(model, loader(test, args.data_root, eval_transform(), args, False), device)
+            p, y, i = predict(model, loader(test, args.data_root, ev_tf, args, False), device)
             part = test.iloc[i][["name", "subject", "label"]].assign(p=p, fold=k)
             oof.append(part)
             m = binary_metrics(y, p)
@@ -126,7 +140,7 @@ def main():
     print(f"[{args.arch}] final source model on all {src.subject.nunique()} subjects, {final_epochs} epochs")
     set_seed(args.seed)
     model = LeukemiaNet(args.arch, pretrained=not args.no_pretrained).to(device)
-    hist, _, secs = fit(model, loader(src, args.data_root, train_transform(), args, True), device,
+    hist, _, secs = fit(model, loader(src, args.data_root, tr_tf, args, True), device,
                         lr=args.lr, weight_decay=args.weight_decay, max_epochs=final_epochs,
                         weights=class_weights(src.label, device))
     pd.DataFrame(hist).to_csv(out / "final_history.csv", index=False)
