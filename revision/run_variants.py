@@ -95,7 +95,7 @@ def main():
             log(f"SKIP {name} (--skip)")
             continue
         run(name, args, marker)
-    log("ALL VARIANTS FINISHED. Send revision/results/variants (without *.pt files) back.")
+    log("ALL VARIANTS FINISHED. Results are in revision/results/variants.")
 
 
 if __name__ == "__main__":

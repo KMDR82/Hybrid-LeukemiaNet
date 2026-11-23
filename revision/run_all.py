@@ -103,7 +103,7 @@ def main():
             log(f"SKIP {name} (--skip)")
             continue
         run(name, args, marker)
-    log("ALL STAGES FINISHED. Send the folder revision/results (without *.pt files) back.")
+    log("ALL STAGES FINISHED. Results are in revision/results.")
 
 
 if __name__ == "__main__":

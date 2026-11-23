@@ -44,9 +44,9 @@ def get_transforms():
     
     ft_transform = transforms.Compose([
         transforms.Resize((224, 224)), 
-        transforms.RandomHorizontalFlip(), # TTA'da olduğu için eğitimde de olması mantıklı
-        transforms.RandomRotation(15),     # Notebook'tan eklendi
-        transforms.ColorJitter(brightness=0.1, contrast=0.1), # Değerler notebook ile eşitlendi
+        transforms.RandomHorizontalFlip(), # also used at test time (TTA), so applied during training too
+        transforms.RandomRotation(15),     # taken from the original notebook
+        transforms.ColorJitter(brightness=0.1, contrast=0.1), # values match the original notebook
         transforms.ToTensor(), 
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ])

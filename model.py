@@ -11,7 +11,7 @@ class DynamicLeukemiaNet(nn.Module):
         super(DynamicLeukemiaNet, self).__init__()
         
         # CNN Stream (EfficientNet-B0)
-        # weights='DEFAULT' ile en güncel ImageNet ağırlıkları çekilir
+        # weights='DEFAULT' loads the latest ImageNet weights
         self.cnn = models.efficientnet_b0(weights='DEFAULT')
         cnn_out_features = self.cnn.classifier[1].in_features
         self.cnn.classifier = nn.Identity()

@@ -55,8 +55,27 @@ python revision/run_all.py --data-root "D:/data/C-NMC_Leukemia"
 * DataLoader errors on Windows: add `--workers 0`.
 * Progress: `revision/results/run_all.log` and one log per stage.
 
-## 4. What to send back
+## 4. Pre-specified variants (sensitivity analysis, Table S6)
 
-Zip `revision/splits` and `revision/results` **without** the `*.pt` weight files.
-The weight files (`results/source/*/final_source_model.pt`,
-`results/target/adapted_r0_*.pt`) should be kept for the Zenodo archive.
+```
+python revision/run_variants.py --data-root "D:/data/C-NMC_Leukemia"
+```
+
+Results are written to `revision/results/variants/`.
+
+## 5. Figures 1 and 2
+
+`figures_drawio.py` writes the protocol and architecture diagrams as editable
+draw.io files and as SVG; `render_figures.js` (Node.js + Playwright) converts
+the SVG files to PDF and PNG.
+
+```
+python revision/figures_drawio.py --out revision/results/figures_drawio
+node revision/render_figures.js revision/results/figures_drawio
+```
+
+## 6. Archived outputs
+
+Split files, per-image predictions, logs, tables, figures and the source-phase
+model weights (`results/source/*/final_source_model.pt`) are archived on Zenodo:
+https://doi.org/10.5281/zenodo.24483443
