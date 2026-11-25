@@ -78,4 +78,4 @@ node revision/render_figures.js revision/results/figures_drawio
 
 Split files, per-image predictions, logs, tables, figures and the source-phase
 model weights (`results/source/*/final_source_model.pt`) are archived on Zenodo:
-https://doi.org/10.5281/zenodo.24483443
+https://doi.org/10.5281/zenodo.24528926

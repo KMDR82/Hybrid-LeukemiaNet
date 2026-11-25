@@ -7,7 +7,7 @@
 > **Revised evaluation (PeerJ CS revision).** The scripts in the repository root are the original
 > submission code, which split the data at image level. All results in the revised manuscript come
 > from the subject-level protocol in [`revision/`](revision/README.md). Code, splits, predictions,
-> logs and model weights of the revision are archived at https://doi.org/10.5281/zenodo.24483443.
+> logs and model weights of the revision are archived at https://doi.org/10.5281/zenodo.24528926.
 
 ## 1. Description
 This repository contains the official codebase and implementation for the paper: **"A Hybrid Dual-Channel Deep Learning Model for Acute Lymphoblastic Leukemia Detection"**. 
