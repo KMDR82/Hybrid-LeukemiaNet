@@ -1,0 +1,318 @@
+{
+  "source_total": {
+    "subjects_ALL": 47,
+    "subjects_HEM": 26,
+    "images_ALL": 7272,
+    "images_HEM": 3389
+  },
+  "source_folds": {
+    "0": {
+      "subjects_ALL": 8,
+      "subjects_HEM": 5,
+      "images_ALL": 1453,
+      "images_HEM": 678
+    },
+    "1": {
+      "subjects_ALL": 10,
+      "subjects_HEM": 5,
+      "images_ALL": 1451,
+      "images_HEM": 680
+    },
+    "2": {
+      "subjects_ALL": 9,
+      "subjects_HEM": 6,
+      "images_ALL": 1452,
+      "images_HEM": 676
+    },
+    "3": {
+      "subjects_ALL": 9,
+      "subjects_HEM": 5,
+      "images_ALL": 1458,
+      "images_HEM": 678
+    },
+    "4": {
+      "subjects_ALL": 11,
+      "subjects_HEM": 5,
+      "images_ALL": 1458,
+      "images_HEM": 677
+    }
+  },
+  "target_total": {
+    "subjects_ALL": 13,
+    "subjects_HEM": 15,
+    "images_ALL": 1219,
+    "images_HEM": 648
+  },
+  "target_repeats": {
+    "0": {
+      "adapt_train": {
+        "subjects_ALL": 2,
+        "subjects_HEM": 2,
+        "images_ALL": 211,
+        "images_HEM": 131,
+        "subject_ids": [
+          "53",
+          "62",
+          "H31",
+          "H32"
+        ]
+      },
+      "adapt_val": {
+        "subjects_ALL": 1,
+        "subjects_HEM": 1,
+        "images_ALL": 7,
+        "images_HEM": 20,
+        "subject_ids": [
+          "61",
+          "H34"
+        ]
+      },
+      "test": {
+        "subjects_ALL": 10,
+        "subjects_HEM": 12,
+        "images_ALL": 1001,
+        "images_HEM": 497,
+        "subject_ids": [
+          "54",
+          "55",
+          "57",
+          "58",
+          "59",
+          "60",
+          "63",
+          "64",
+          "65",
+          "66",
+          "H25",
+          "H26",
+          "H27",
+          "H28",
+          "H29",
+          "H30",
+          "H33",
+          "H35",
+          "H36",
+          "H39",
+          "H49",
+          "H50"
+        ]
+      }
+    },
+    "1": {
+      "adapt_train": {
+        "subjects_ALL": 2,
+        "subjects_HEM": 2,
+        "images_ALL": 123,
+        "images_HEM": 18,
+        "subject_ids": [
+          "54",
+          "59",
+          "H27",
+          "H33"
+        ]
+      },
+      "adapt_val": {
+        "subjects_ALL": 1,
+        "subjects_HEM": 1,
+        "images_ALL": 164,
+        "images_HEM": 162,
+        "subject_ids": [
+          "66",
+          "H49"
+        ]
+      },
+      "test": {
+        "subjects_ALL": 10,
+        "subjects_HEM": 12,
+        "images_ALL": 932,
+        "images_HEM": 468,
+        "subject_ids": [
+          "53",
+          "55",
+          "57",
+          "58",
+          "60",
+          "61",
+          "62",
+          "63",
+          "64",
+          "65",
+          "H25",
+          "H26",
+          "H28",
+          "H29",
+          "H30",
+          "H31",
+          "H32",
+          "H34",
+          "H35",
+          "H36",
+          "H39",
+          "H50"
+        ]
+      }
+    },
+    "2": {
+      "adapt_train": {
+        "subjects_ALL": 2,
+        "subjects_HEM": 2,
+        "images_ALL": 365,
+        "images_HEM": 39,
+        "subject_ids": [
+          "53",
+          "66",
+          "H25",
+          "H34"
+        ]
+      },
+      "adapt_val": {
+        "subjects_ALL": 1,
+        "subjects_HEM": 1,
+        "images_ALL": 83,
+        "images_HEM": 31,
+        "subject_ids": [
+          "63",
+          "H35"
+        ]
+      },
+      "test": {
+        "subjects_ALL": 10,
+        "subjects_HEM": 12,
+        "images_ALL": 771,
+        "images_HEM": 578,
+        "subject_ids": [
+          "54",
+          "55",
+          "57",
+          "58",
+          "59",
+          "60",
+          "61",
+          "62",
+          "64",
+          "65",
+          "H26",
+          "H27",
+          "H28",
+          "H29",
+          "H30",
+          "H31",
+          "H32",
+          "H33",
+          "H36",
+          "H39",
+          "H49",
+          "H50"
+        ]
+      }
+    },
+    "3": {
+      "adapt_train": {
+        "subjects_ALL": 2,
+        "subjects_HEM": 2,
+        "images_ALL": 130,
+        "images_HEM": 67,
+        "subject_ids": [
+          "55",
+          "63",
+          "H34",
+          "H36"
+        ]
+      },
+      "adapt_val": {
+        "subjects_ALL": 1,
+        "subjects_HEM": 1,
+        "images_ALL": 164,
+        "images_HEM": 29,
+        "subject_ids": [
+          "66",
+          "H50"
+        ]
+      },
+      "test": {
+        "subjects_ALL": 10,
+        "subjects_HEM": 12,
+        "images_ALL": 925,
+        "images_HEM": 552,
+        "subject_ids": [
+          "53",
+          "54",
+          "57",
+          "58",
+          "59",
+          "60",
+          "61",
+          "62",
+          "64",
+          "65",
+          "H25",
+          "H26",
+          "H27",
+          "H28",
+          "H29",
+          "H30",
+          "H31",
+          "H32",
+          "H33",
+          "H35",
+          "H39",
+          "H49"
+        ]
+      }
+    },
+    "4": {
+      "adapt_train": {
+        "subjects_ALL": 2,
+        "subjects_HEM": 2,
+        "images_ALL": 401,
+        "images_HEM": 102,
+        "subject_ids": [
+          "57",
+          "65",
+          "H26",
+          "H31"
+        ]
+      },
+      "adapt_val": {
+        "subjects_ALL": 1,
+        "subjects_HEM": 1,
+        "images_ALL": 69,
+        "images_HEM": 29,
+        "subject_ids": [
+          "64",
+          "H50"
+        ]
+      },
+      "test": {
+        "subjects_ALL": 10,
+        "subjects_HEM": 12,
+        "images_ALL": 749,
+        "images_HEM": 517,
+        "subject_ids": [
+          "53",
+          "54",
+          "55",
+          "58",
+          "59",
+          "60",
+          "61",
+          "62",
+          "63",
+          "66",
+          "H25",
+          "H27",
+          "H28",
+          "H29",
+          "H30",
+          "H32",
+          "H33",
+          "H34",
+          "H35",
+          "H36",
+          "H39",
+          "H49"
+        ]
+      }
+    }
+  }
+}
